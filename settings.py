@@ -1,0 +1,1 @@
+EXECUTABLE_LOCATION = "opera.exe"
