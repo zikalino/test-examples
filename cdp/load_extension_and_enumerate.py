@@ -36,6 +36,8 @@ async def send_and_wait_for_response(websocket, session_id, method, params):
 
 async def main():
   global next_id
+  
+  # path to extension to be loaded
   extension_path = str(Path(__file__).resolve().parent.joinpath('extension'))
   print(extension_path)
 
@@ -44,20 +46,47 @@ async def main():
                           'args': ['--load-extension=' + extension_path]})
 
   async with websockets.connect(browser.wsEndpoint) as websocket:
+    print("CONNECTED....")
 
-    response = await send_and_wait_for_response(
-        websocket,
-        None,
-        'SystemInfo.getInfo',
-        {}
-    )
+    #response = await send_and_wait_for_response(
+    #    websocket,
+    #    None,
+    #    'Extensions.loadUnpacked',
+    #    {
+    #        'path': extension_path
+    #    }
+    #)
 
-    response = await send_and_wait_for_response(
-        websocket,
-        None,
-        'SystemInfo.getProcessInfo',
-        {}
-    )
+    for i in range(10):
+        response = await send_and_wait_for_response(
+                websocket,
+                None,
+                'Target.getTargets',
+                {
+                    'filter': [
+                        {
+                        "exclude": False,
+                        "type": "browser"
+                        },
+                        #{
+                        #    "exclude": True,
+                        #    "type": "page"
+                        #},
+                        {
+                            "exclude": False
+                        }
+                    ]
+                })
 
+        #print("slepping 60")
+        #time.sleep(60)
+        #print("continue")
+
+        print('----------------------------- ' + str(len(response['result']['targetInfos'])))
+        for l in response['result']['targetInfos']:
+            if 'koi' in l['url']:
+                print(l['targetId'] + " | " + l['type']  + ' | ' + l['title'] + ' | ' + l['url'])
+        time.sleep(5)
+    
 
 asyncio.get_event_loop().run_until_complete(main())

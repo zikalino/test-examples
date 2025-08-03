@@ -1,0 +1,29 @@
+{
+  "description": "Test Extension",
+  "manifest_version": 3,
+  "author": "Test Software AS",
+  "name": "Test Extension",
+  "version": "0.1.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "backgroundx.js",
+    "type": "module"
+  },
+  "developer": {
+    "name": "Opera Software AS"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["contentx.js"]
+    }
+  ],
+  "permissions": [
+    "offscreen"
+  ],
+  "host_permissions": ["<all_urls>"]
+}
