@@ -1,5 +1,3 @@
-## demo.py
-
 import asyncio
 from connection import launch_and_connect, send, receive_response, get_next_id
 
