@@ -18,7 +18,6 @@ async def launch_and_connect():
   global websocket
   # path to extension to be loaded
   extension_path = str(Path(__file__).resolve().parent.joinpath('extension'))
-  print(extension_path)
 
   browser = await launch({'executablePath': EXECUTABLE_LOCATION,
                           'ignoreDefaultArgs': True,
@@ -32,9 +31,8 @@ async def send(ws, msg):
 async def receive_response(ws, msg):
     response = {}
     while (not 'id' in response) or (response['id'] != msg['id']):
+        # XXX - store if response was unrelated
         response = json.loads(await ws.recv())
-        print(f" ... received: ")
-        print(response)
     return response
 
 def get_next_id():
