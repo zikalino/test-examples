@@ -15,6 +15,9 @@ async def create_and_attach_tab(ws, url):
 
   target_id = response['result']['targetId']
 
+  return await attach_to_target(ws, target_id)
+
+async def attach_to_target(ws, target_id):
   msg = {
     'id': get_next_id(),
     'method': 'Target.attachToTarget',
