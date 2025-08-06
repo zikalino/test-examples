@@ -11,7 +11,7 @@ async def main():
     'id': get_next_id(),
     'method': 'SystemInfo.getInfo'
   }
-  await send (ws, msg)
+  await send(ws, msg)
   response = await receive_response(ws, msg)
   print(json.dumps(response, indent=2))
 

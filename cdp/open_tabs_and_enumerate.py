@@ -1,53 +1,65 @@
 import asyncio
+import json
 from connection import launch_and_connect, send, receive_response, get_next_id
+
+async def create_and_attach_tab(ws, url):
+  msg = {
+    'id': get_next_id(),
+    'method': 'Target.createTarget',
+    'params': {
+      'url': url
+    }
+  }
+  await send(ws, msg)
+  response = await receive_response(ws, msg)
+
+  target_id = response['result']['targetId']
+
+  msg = {
+    'id': get_next_id(),
+    'method': 'Target.attachToTarget',
+    'params': {
+      'targetId': target_id,
+      'flatten': True
+    }
+  }
+  await send(ws, msg)
+  response = await receive_response(ws, msg)
+  session_id = response['result']['sessionId']
+
+  msg = {
+    'id': get_next_id(),
+    'method': 'Runtime.enable',
+    'sessionId': session_id,
+  }
+  await send(ws, msg)
+  response = await receive_response(ws, msg)
+  return session_id
+
+async def evaluate(ws, session_id, expression):
+  msg = {
+    'id': get_next_id(),
+    'method': 'Runtime.evaluate',
+    'sessionId': session_id,
+    'params': {
+      'expression': expression
+    }
+  }
+
+  await send(ws, msg)
+  response = await receive_response(ws, msg)
+  return response['result']['result']['value']
 
 async def main():
 
   ws = await launch_and_connect()
 
-  msg = {
-    'id': get_next_id(),
-    'method': 'Target.createTarget',
-    'params': {
-      'url': 'https://onet.pl'
-    }
-  }
-  await send(ws, msg)
-  response = await receive_response(ws, msg)
+  session_id = await create_and_attach_tab(ws, 'https://google.com')
 
-  msg = {
-    'id': get_next_id(),
-    'method': 'Target.createTarget',
-    'params': {
-      'url': 'https://gazeta.pl'
-    }
-  }
-  await send(ws, msg)
-  response = await receive_response(ws, msg)
+  result = await evaluate(ws, session_id, "'Result is ' + 'OK'")
 
-  msg = {
-    'id': get_next_id(),
-    'method': 'Target.getTargets',
-    'params': {
-      'filter': [
-        {
-          "exclude": False,
-          "type": "browser"
-        },
-        {
-          "exclude": True,
-          "type": "page"
-        },
-        {
-          "exclude": False
-        }
-      ]
-    }
-  }
-  await send(ws, msg)
-  response = await receive_response(ws, msg)
+  print(json.dumps(result, indent=2))
 
-  for l in response['result']['targetInfos']:
-    print(l['targetId'] + " | " + l['type']  + ' | ' + l['title'] + ' | ' + l['url'])
+
 
 asyncio.get_event_loop().run_until_complete(main())

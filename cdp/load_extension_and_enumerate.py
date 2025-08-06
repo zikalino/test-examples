@@ -43,7 +43,7 @@ async def main():
   #    }
   #)
 
-  for i in range(10):
+  for i in range(100):
     msg = { 'id': get_next_id(),
             'method': 'Target.getTargets',
             'params': {
@@ -67,7 +67,7 @@ async def main():
 
     print('----------------------------- ' + str(len(response['result']['targetInfos'])))
     for l in response['result']['targetInfos']:
-        if 'koi' in l['url']:
+        if 'knoh' in l['url']:
             print(l['targetId'] + " | " + l['type']  + ' | ' + l['title'] + ' | ' + l['url'])
     time.sleep(5)
 
