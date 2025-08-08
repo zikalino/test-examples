@@ -13,9 +13,6 @@
     "service_worker": "backgroundx.js",
     "type": "module"
   },
-  "developer": {
-    "name": "Opera Software AS"
-  },
   "content_scripts": [
     {
       "matches": ["*://*/*"],
