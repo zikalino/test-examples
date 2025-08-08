@@ -25,5 +25,12 @@
   "permissions": [
     "offscreen"
   ],
+  "sidebar_action": {
+    "default_icon": "icons/icon128.png",
+    "default_panel": "sidebarx.html",
+    "default_title": "My Sidebar",
+    "panel_width": 364
+  },
+
   "host_permissions": ["<all_urls>"]
 }
