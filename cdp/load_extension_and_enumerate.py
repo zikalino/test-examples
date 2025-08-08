@@ -45,7 +45,8 @@ async def main():
 
     print('----------------------------- ' + str(len(response['result']['targetInfos'])))
     for l in response['result']['targetInfos']:
-        if 'knoh' in l['url']:
+        #if 'knoh' in l['url']:
+        if 'koi' in l['url']:
             print(l['targetId'] + " | " + l['type']  + ' | ' + l['title'] + ' | ' + l['url'])
     time.sleep(5)
 

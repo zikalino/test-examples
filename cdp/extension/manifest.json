@@ -23,7 +23,8 @@
     }
   ],
   "permissions": [
-    "offscreen"
+    "offscreen",
+    "activeTab"
   ],
   "sidebar_action": {
     "default_icon": "icons/icon128.png",
@@ -31,6 +32,14 @@
     "default_title": "My Sidebar",
     "panel_width": 364
   },
-
+  "action": {
+    "default_popup": "popupx.html",
+    "default_icon": {
+      "16": "icons/action.png",
+      "24": "icons/action.png",
+      "32": "icons/action.png"
+    },
+    "default_title": "My Action"
+  },
   "host_permissions": ["<all_urls>"]
 }
