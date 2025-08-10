@@ -14,16 +14,24 @@ from settings import EXECUTABLE_LOCATION
 next_id = 1
 websocket = None
 
-async def launch_and_connect():
+async def launch_and_connect(user_dir=None):
+
   global websocket
   # path to extension to be loaded
   extension_path = str(Path(__file__).resolve().parent.joinpath('extension'))
 
-  browser = await launch({'executablePath': EXECUTABLE_LOCATION,
-                          'ignoreDefaultArgs': True,
-                          'args': ['--load-extension=' + extension_path,
-                                   '--enable-automation',
-                                   '--enable-unsafe-extension-debugging']})
+  args = {'executablePath': EXECUTABLE_LOCATION,
+          'ignoreDefaultArgs': True,
+          'args': ['--load-extension=' + extension_path,
+          '--enable-automation',
+          '--enable-unsafe-extension-debugging'
+          ]}
+
+  if user_dir:
+    args['args'].append('--user-data-dir=' + user_dir)
+
+  browser = await launch(args)
+
 
   return await websockets.connect(browser.wsEndpoint)
   

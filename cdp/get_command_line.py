@@ -1,11 +1,14 @@
 import asyncio
 import json
 import time
+import os
 from connection import launch_and_connect, send, receive_response, get_next_id
+from pathlib import Path
 
 async def main():
 
-  ws = await launch_and_connect()
+  dir = os.path.join(Path.cwd(), "tmp")
+  ws = await launch_and_connect(userDir=dir)
 
   msg = {
     'id': get_next_id(),
