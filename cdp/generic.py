@@ -37,6 +37,21 @@ async def attach_to_target(ws, target_id):
   response = await receive_response(ws, msg)
   return session_id
 
+async def close_target(ws, target_id):
+  msg = {
+    'id': get_next_id(),
+    'method': 'Target.closeTarget',
+    'params': {
+      'targetId': target_id
+    }
+  }
+  await send(ws, msg)
+  response = await receive_response(ws, msg)
+  if 'result' in response['result'] and 'value' in response['result']['result']:
+    return response['result']['result']['value']
+  else:
+    return response['result']
+
 async def evaluate(ws, session_id, expression):
   msg = {
     'id': get_next_id(),
@@ -49,4 +64,8 @@ async def evaluate(ws, session_id, expression):
 
   await send(ws, msg)
   response = await receive_response(ws, msg)
-  return response['result']['result']['value']
+  if 'value' in response['result']['result']:
+    return response['result']['result']['value']
+  else:
+    return response['result']['result']
+

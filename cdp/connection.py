@@ -22,7 +22,7 @@ async def launch_and_connect(user_dir=None):
 
   args = {'executablePath': EXECUTABLE_LOCATION,
           'ignoreDefaultArgs': True,
-          'args': ['--load-extension=' + extension_path,
+          'args': [  #'--load-extension=' + extension_path,
           '--enable-automation',
           '--enable-unsafe-extension-debugging'
           ]}
