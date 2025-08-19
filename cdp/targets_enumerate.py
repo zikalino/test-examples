@@ -4,123 +4,49 @@ import asyncio
 import websockets
 import json
 import time
-from pyppeteer import launch
-
-next_id = 1
-
-async def send_and_wait_for_response(websocket, session_id, method, params):
-    global next_id
-    # send message
-    message = { 'id': next_id,
-                'method': method,
-                'params': params
-              }
-    if session_id:
-        message['sessionId'] = session_id
-
-    await websocket.send(json.dumps(message))
-
-    # and await response, just dump all messages without appropriate id
-    response = {}
-    while (not 'id' in response) or (response['id'] != next_id):
-        response = json.loads(await websocket.recv())
-        print(f" ... received: ")
-        print(response)
-
-    next_id += 1
-    return response
+from connection import launch_and_connect, get_next_id, send, receive_response
+from generic import attach_to_target
 
 async def main():
-  global next_id
-  browser = await launch({"executablePath": EXECUTABLE_LOCATION})
+  ws = await launch_and_connect()
 
-  async with websockets.connect(browser.wsEndpoint) as websocket:
-    print("CONNECTED....")
-
-    response = await send_and_wait_for_response(
-            websocket,
-            None,
-            'Target.getTargets',
-            {
-                'filter': [
-                    {
-                    "exclude": False,
-                    "type": "browser"
-                    },
-                    {
-                        "exclude": True,
-                        "type": "page"
-                    },
-                    {
-                        "exclude": False
-                    }
-                ]
-            })
-
-    #print("slepping 60")
-    #time.sleep(60)
-    #print("continue")
-
-    for l in response['result']['targetInfos']:
-        # if l['url'] == '':
-          #print("SLEPPING BEFORE ATTACHING")
-          #time.sleep(60)
-          #print("SLEPPING IS OVER")
-
-          print('============================================================== ATTACHING TO:')
-          print(l)
-          response = await send_and_wait_for_response(
-                websocket,
-                None,
-                'Target.attachToTarget',
+  time.sleep(20)
+  msg = {
+    'id': get_next_id(),
+    'method': 'Target.getTargets',
+    'params': {
+            'filter': [
                 {
-                    'targetId': l['targetId'],
-                    'flatten': True
-                }
-            )
-
-          sessionId = response['result']['sessionId']
-
-          # autoattach
-          print('------------------------------- AUTO ATTACH:')
-          response = await send_and_wait_for_response(
-                websocket,
-                sessionId,
-                'Target.setAutoAttach',
+                "exclude": False,
+                "type": "browser"
+                },
                 {
-                    "autoAttach": True,
-                    "flatten": True,
-                    "waitForDebuggerOnStart": False
+                    "exclude": True,
+                    "type": "page"
+                },
+                {
+                    "exclude": False
                 }
-          )
+            ]
+        }
+  }
 
-          # now we are attached, try to enable page
-          print('------------------------------- ENABLING PAGE:')
-          response = await send_and_wait_for_response(
-                websocket,
-                sessionId,
-                'Page.enable',
-                {}
-          )
+  await send(ws, msg)
+  response = await receive_response(ws, msg)
+  print(json.dumps(response, indent=2))
 
-          # now we are attached, try to enable log
-          print('------------------------------- ENABLING LOG:')
-          response = await send_and_wait_for_response(
-                websocket,
-                sessionId,
-                'Log.enable',
-                {}
-          )
+  for l in response['result']['targetInfos']:
+    session_id = await attach_to_target(ws, l['targetId'])
 
+    msg = {
+      'id': get_next_id(),
+      'sessionId': session_id,
+      'method': 'Page.getAppManifest'
+    }
+    await send(ws, msg)
+    response = await receive_response(ws, msg)
+    print(json.dumps(response, indent=2))
 
-          # now we are attached, try to enable log
-          print('------------------------------- ENABLING RUNTIME:')
-          response = await send_and_wait_for_response(
-                websocket,
-                sessionId,
-                'Runtime.enable',
-                {}
-          )
 
 
 asyncio.get_event_loop().run_until_complete(main())
