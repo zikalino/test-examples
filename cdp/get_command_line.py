@@ -8,7 +8,7 @@ from pathlib import Path
 async def main():
 
   dir = os.path.join(Path.cwd(), "tmp")
-  ws = await launch_and_connect(userDir=dir)
+  ws = await launch_and_connect(user_dir=dir)
 
   msg = {
     'id': get_next_id(),
