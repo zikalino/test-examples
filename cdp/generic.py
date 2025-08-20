@@ -15,6 +15,18 @@ async def create_and_attach_tab(ws, url):
 
   return await attach_to_target(ws, target_id)
 
+async def get_target_info(ws, target_id):
+  msg = {
+    'id': get_next_id(),
+    'method': 'Target.getTargetInfo',
+    'params': {
+      'targetId': target_id
+    }
+  }
+  await send(ws, msg)
+  response = await receive_response(ws, msg)
+  return response
+
 async def attach_to_target(ws, target_id):
   msg = {
     'id': get_next_id(),
@@ -68,4 +80,15 @@ async def evaluate(ws, session_id, expression):
     return response['result']['result']['value']
   else:
     return response['result']['result']
+
+async def enable_log(ws, session_id):
+  msg = {
+    'id': get_next_id(),
+    'method': 'Log.enable',
+    'sessionId': session_id,
+    'params': {}
+  }
+
+  await send(ws, msg)
+  response = await receive_response(ws, msg)
 
